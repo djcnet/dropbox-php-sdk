@@ -188,7 +188,11 @@ class DropboxClient
         if ($request->getEndpointType() === 'content') {
             //Dropbox requires the parameters to be passed
             //through the 'Dropbox-API-Arg' header
-            $request->setHeaders(['Dropbox-API-Arg' => json_encode($request->getParams())]);
+            if ($request->getEndpoint() != '/files/get_thumbnail_batch') {
+                $request->setHeaders(['Dropbox-API-Arg' => json_encode($request->getParams())]);
+            } else {
+                $requestBody = $request->getJsonBody()->getBody();
+            }
 
             //If a File is also being uploaded
             if ($request->hasFile()) {
@@ -197,9 +201,6 @@ class DropboxClient
 
                 //Request Body (File Contents)
                 $requestBody = $request->getStreamBody()->getBody();
-            } else {
-                //Empty Body
-                $requestBody = null;
             }
         } else {
             //The endpoint is 'api'
